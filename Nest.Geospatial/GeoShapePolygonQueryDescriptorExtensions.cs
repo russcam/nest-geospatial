@@ -2,8 +2,18 @@ using GeoAPI.Geometries;
 
 namespace Nest.Geospatial
 {
-    public static class GeoShapePolygonQueryDescriptorExtensions
+	/// <summary>
+	/// Extension methods for GeoShapePolygonQueryDescriptor&lt;T&gt;
+	/// </summary>
+	public static class GeoShapePolygonQueryDescriptorExtensions
     {
+		/// <summary>
+		/// Sets the coordinates using the Polygon
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="polygon">the Polygon</param>
+		/// <returns>the <see cref="GeoShapePolygonQueryDescriptor{T}"/></returns>
         public static GeoShapePolygonQueryDescriptor<T> Coordinates<T>(
             this GeoShapePolygonQueryDescriptor<T> descriptor, 
             IPolygon polygon) where T : class
@@ -11,7 +21,14 @@ namespace Nest.Geospatial
             return descriptor.Coordinates(polygon.GetCoordinates());
         }
 
-        public static GeoShapePolygonQueryDescriptor<T> Boost<T>(
+		/// <summary>
+		/// Sets the boost
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="boost">the boost</param>
+		/// <returns>the <see cref="GeoShapePolygonQueryDescriptor{T}"/></returns>
+		public static GeoShapePolygonQueryDescriptor<T> Boost<T>(
             this GeoShapePolygonQueryDescriptor<T> descriptor, 
             double? boost) where T : class
         {

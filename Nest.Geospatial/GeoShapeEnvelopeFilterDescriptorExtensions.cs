@@ -2,9 +2,18 @@ using GeoAPI.Geometries;
 
 namespace Nest.Geospatial
 {
-    public static class GeoShapeEnvelopeFilterDescriptorExtensions
+	/// <summary>
+	/// Extension methods for GeoShapeEnvelopeFilterDescriptor
+	/// </summary>
+	public static class GeoShapeEnvelopeFilterDescriptorExtensions
     {
-        public static GeoShapeEnvelopeFilterDescriptor Coordinates(
+		/// <summary>
+		/// Sets the coordinates using the Envelope
+		/// </summary>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="envelope">the Envelope</param>
+		/// <returns>the <see cref="GeoShapeEnvelopeFilterDescriptor"/></returns>
+		public static GeoShapeEnvelopeFilterDescriptor Coordinates(
             this GeoShapeEnvelopeFilterDescriptor descriptor, 
             Envelope envelope)
         {

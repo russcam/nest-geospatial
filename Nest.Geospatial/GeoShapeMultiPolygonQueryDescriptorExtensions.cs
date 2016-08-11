@@ -2,16 +2,33 @@ using GeoAPI.Geometries;
 
 namespace Nest.Geospatial
 {
-    public static class GeoShapeMultiPolygonQueryDescriptorExtensions
+	/// <summary>
+	/// Extension methods for GeoShapeMultiPolygonQueryDescriptor&lt;T&gt;
+	/// </summary>
+	public static class GeoShapeMultiPolygonQueryDescriptorExtensions
     {
-        public static GeoShapeMultiPolygonQueryDescriptor<T> Coordinates<T>(
+		/// <summary>
+		/// Sets the coordinates using the MultiPolygon
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="multiPolygon">the MultiPolygon</param>
+		/// <returns>the <see cref="GeoShapeMultiPolygonQueryDescriptor{T}"/></returns>
+		public static GeoShapeMultiPolygonQueryDescriptor<T> Coordinates<T>(
             this GeoShapeMultiPolygonQueryDescriptor<T> descriptor,
             IMultiPolygon multiPolygon) where T : class
         {
             return descriptor.Coordinates(multiPolygon.GetCoordinates());
         }
 
-        public static GeoShapeMultiPolygonQueryDescriptor<T> Boost<T>(
+		/// <summary>
+		/// Sets the boost
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="boost">the boost</param>
+		/// <returns>the <see cref="GeoShapeMultiPolygonQueryDescriptor{T}"/></returns>
+		public static GeoShapeMultiPolygonQueryDescriptor<T> Boost<T>(
             this GeoShapeMultiPolygonQueryDescriptor<T> descriptor,
             double? boost = null) where T : class
         {

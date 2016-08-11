@@ -2,16 +2,33 @@ using GeoAPI.Geometries;
 
 namespace Nest.Geospatial
 {
-    public static class GeoShapePointQueryDescriptorExtensions
+	/// <summary>
+	/// Extension methods for GeoShapePointQueryDescriptor&lt;T&gt;
+	/// </summary>
+	public static class GeoShapePointQueryDescriptorExtensions
     {
-        public static GeoShapePointQueryDescriptor<T> Coordinates<T>(
+		/// <summary>
+		/// Sets the coordinates using the Point
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="point">the Point</param>
+		/// <returns>the <see cref="GeoShapePointQueryDescriptor{T}"/></returns>
+		public static GeoShapePointQueryDescriptor<T> Coordinates<T>(
             this GeoShapePointQueryDescriptor<T> descriptor, 
             IPoint point) where T : class
         {
             return descriptor.Coordinates(point.GetCoordinates());
         }
 
-        public static GeoShapePointQueryDescriptor<T> Boost<T>(
+		/// <summary>
+		/// Sets the boost
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="boost">the boost</param>
+		/// <returns>the <see cref="GeoShapePointQueryDescriptor{T}"/></returns>
+		public static GeoShapePointQueryDescriptor<T> Boost<T>(
             this GeoShapePointQueryDescriptor<T> descriptor, 
             double? boost) where T : class
         {

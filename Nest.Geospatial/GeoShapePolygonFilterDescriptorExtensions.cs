@@ -1,11 +1,19 @@
-﻿using System.Runtime.Remoting.Messaging;
-using GeoAPI.Geometries;
+﻿using GeoAPI.Geometries;
 
 namespace Nest.Geospatial
 {
-    public static class GeoShapePolygonFilterDescriptorExtensions
+	/// <summary>
+	/// Extension methods for GeoShapePolygonFilterDescriptor
+	/// </summary>
+	public static class GeoShapePolygonFilterDescriptorExtensions
     {
-        public static GeoShapePolygonFilterDescriptor Coordinates(
+		/// <summary>
+		/// Sets the coordinates using the Polygon
+		/// </summary>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="polygon">the polygon</param>
+		/// <returns>the <see cref="GeoShapePolygonFilterDescriptor"/></returns>
+		public static GeoShapePolygonFilterDescriptor Coordinates(
             this GeoShapePolygonFilterDescriptor descriptor, 
             IPolygon polygon)
         {

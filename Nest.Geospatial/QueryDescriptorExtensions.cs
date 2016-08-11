@@ -4,10 +4,13 @@ using GeoAPI.Geometries;
 
 namespace Nest.Geospatial
 {
-    public static class QueryDescriptorExtensions
+	/// <summary>
+	/// Extension methods for QueryDescriptor&lt;T&gt;
+	/// </summary>
+	public static class QueryDescriptorExtensions
     {
         /// <summary>
-        ///     Query documents indexed using a geo_shape type.
+        /// Query documents indexed using a geo_shape type.
         /// </summary>
         public static QueryContainer GeoShape<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -78,7 +81,7 @@ namespace Nest.Geospatial
         }
 
         /// <summary>
-        ///     Query documents indexed using a geo_shape type.
+        /// Query documents indexed using a geo_shape type.
         /// </summary>
         public static QueryContainer GeoShape<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -91,57 +94,57 @@ namespace Nest.Geospatial
             {
                 case OgcGeometryType.Point:
                     var point = (IPoint)geometry;
-                    return queryDescriptor.GeoShapePoint(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(field)
-                            .Coordinates(point));
+                    return queryDescriptor.GeoShapePoint(geo => geo
+                        .Name(name)
+                        .Boost(boost)
+                        .OnField(field)
+                        .Coordinates(point)
+					);
 
                 case OgcGeometryType.LineString:
                     var lineString = (ILineString)geometry;
-                    return queryDescriptor.GeoShapeLineString(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(field)
-                            .Coordinates(lineString));
+                    return queryDescriptor.GeoShapeLineString(geo => geo
+                        .Name(name)
+                        .Boost(boost)
+                        .OnField(field)
+                        .Coordinates(lineString)
+					);
 
                 case OgcGeometryType.Polygon:
                     var polygon = (IPolygon)geometry;
-                    return queryDescriptor.GeoShapePolygon(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(field)
-                            .Coordinates(polygon));
+                    return queryDescriptor.GeoShapePolygon(geo => geo
+                        .Name(name)
+                        .Boost(boost)
+                        .OnField(field)
+                        .Coordinates(polygon)
+					);
 
                 case OgcGeometryType.MultiPoint:
                     var multiPoint = (IMultiPoint)geometry;
-                    return queryDescriptor.GeoShapeMultiPoint(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(field)
-                            .Coordinates(multiPoint));
+                    return queryDescriptor.GeoShapeMultiPoint(geo => geo
+                        .Name(name)
+                        .Boost(boost)
+                        .OnField(field)
+                        .Coordinates(multiPoint)
+					);
 
                 case OgcGeometryType.MultiLineString:
                     var multiLineString = (IMultiLineString)geometry;
-                    return queryDescriptor.GeoShapeMultiLineString(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(field)
-                            .Coordinates(multiLineString));
+                    return queryDescriptor.GeoShapeMultiLineString(geo => geo
+                        .Name(name)
+                        .Boost(boost)
+                        .OnField(field)
+                        .Coordinates(multiLineString)
+					);
 
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (IMultiPolygon)geometry;
-                    return queryDescriptor.GeoShapeMultiPolygon(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(field)
-                            .Coordinates(multiPolygon));
+                    return queryDescriptor.GeoShapeMultiPolygon(geo => geo
+						.Name(name)
+						.Boost(boost)
+						.OnField(field)
+						.Coordinates(multiPolygon)
+					);
 
                 default:
                     throw new NotSupportedException($"geometry '{geometry.GeometryType}' not supported");
@@ -149,7 +152,7 @@ namespace Nest.Geospatial
         }
 
         /// <summary>
-        ///     Queries documents indexed using the circle geo_shape type.
+        /// Query documents indexed using the circle geo_shape type.
         /// </summary>
         public static QueryContainer GeoShapeCircle<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -160,17 +163,17 @@ namespace Nest.Geospatial
             string name = null,
             double? boost = null) where T : class
         {
-            return queryDescriptor.GeoShapeCircle(
-                geo => geo
-                    .OnField(expression)
-                    .Name(name)
-                    .Boost(boost)
-                    .Coordinates(point.GetCoordinates())
-                    .Radius($"{distance}{unit.GetStringValue()}"));
+            return queryDescriptor.GeoShapeCircle(geo => geo
+                .OnField(expression)
+                .Name(name)
+                .Boost(boost)
+                .Coordinates(point.GetCoordinates())
+                .Radius($"{distance}{unit.GetStringValue()}")
+			);
         }
 
         /// <summary>
-        ///     Query documents indexed using the circle geo_shape type.
+        /// Query documents indexed using the circle geo_shape type.
         /// </summary>
         public static QueryContainer GeoShapeCircle<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -180,17 +183,17 @@ namespace Nest.Geospatial
             string name = null,
             double? boost = null) where T : class
         {
-            return queryDescriptor.GeoShapeCircle(
-                geo => geo
-                    .OnField(expression)
-                    .Name(name)
-                    .Boost(boost)
-                    .Coordinates(point)
-                    .Radius(radius));
+            return queryDescriptor.GeoShapeCircle(geo => geo
+                .OnField(expression)
+                .Name(name)
+                .Boost(boost)
+                .Coordinates(point)
+                .Radius(radius)
+			);
         }
 
         /// <summary>
-        ///     Query documents indexed using the circle geo_shape type.
+        /// Query documents indexed using the circle geo_shape type.
         /// </summary>
         public static QueryContainer GeoShapeCircle<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -201,17 +204,17 @@ namespace Nest.Geospatial
             string name = null,
             double? boost = null) where T : class
         {
-            return queryDescriptor.GeoShapeCircle(
-                geo => geo
-                    .OnField(field)
-                    .Name(name)
-                    .Boost(boost)
-                    .Coordinates(point)
-                    .Radius($"{distance}{unit.GetStringValue()}"));
+            return queryDescriptor.GeoShapeCircle(geo => geo
+                .OnField(field)
+                .Name(name)
+                .Boost(boost)
+                .Coordinates(point)
+                .Radius($"{distance}{unit.GetStringValue()}")
+			);
         }
 
         /// <summary>
-        ///     Query documents indexed using the circle geo_shape type.
+        /// Query documents indexed using the circle geo_shape type.
         /// </summary>
         public static QueryContainer GeoShapeCircle<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -221,17 +224,17 @@ namespace Nest.Geospatial
             string name = null,
             double? boost = null) where T : class
         {
-            return queryDescriptor.GeoShapeCircle(
-                geo => geo
-                    .OnField(field)
-                    .Name(name)
-                    .Boost(boost)
-                    .Coordinates(point)
-                    .Radius(radius));
+            return queryDescriptor.GeoShapeCircle(geo => geo
+                .OnField(field)
+                .Name(name)
+                .Boost(boost)
+                .Coordinates(point)
+                .Radius(radius)
+			);
         }
 
         /// <summary>
-        ///     Query documents indexed using the envelope geo_shape type.
+        /// Query documents indexed using the envelope geo_shape type.
         /// </summary>
         public static QueryContainer GeoShapeEnvelope<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -240,16 +243,16 @@ namespace Nest.Geospatial
             string name = null,
             double? boost = null) where T : class
         {
-            return queryDescriptor.GeoShapeEnvelope(
-                geo => geo
-                    .OnField(expression)
-                    .Name(name)
-                    .Boost(boost)
-                    .Coordinates(envelope));
+            return queryDescriptor.GeoShapeEnvelope(geo => geo
+                .OnField(expression)
+                .Name(name)
+                .Boost(boost)
+                .Coordinates(envelope)
+			);
         }
 
         /// <summary>
-        ///     Query documents indexed using the envelope geo_shape type.
+        /// Query documents indexed using the envelope geo_shape type.
         /// </summary>
         public static QueryContainer GeoShapeEnvelope<T>(
             this QueryDescriptor<T> queryDescriptor,
@@ -258,12 +261,12 @@ namespace Nest.Geospatial
             string name = null,
             double? boost = null) where T : class
         {
-            return queryDescriptor.GeoShapeEnvelope(
-                geo => geo
-                    .OnField(field)
-                    .Name(name)
-                    .Boost(boost)
-                    .Coordinates(envelope));
+            return queryDescriptor.GeoShapeEnvelope(geo => geo
+                .OnField(field)
+                .Name(name)
+                .Boost(boost)
+                .Coordinates(envelope)
+			);
         }
     }
 }

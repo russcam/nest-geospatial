@@ -3,16 +3,33 @@ using GeoAPI.Geometries;
 
 namespace Nest.Geospatial
 {
-    public static class GeoShapeMultiPointQueryDescriptorExtensions
+	/// <summary>
+	/// Extension methods for GeoShapeMultiPointQueryDescriptor&lt;T&gt;
+	/// </summary>
+	public static class GeoShapeMultiPointQueryDescriptorExtensions
     {
-        public static GeoShapeMultiPointQueryDescriptor<T> Coordinates<T>(
+		/// <summary>
+		/// Sets the coordinates using the MultiPoint
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="multiPoint">the MultiPoint</param>
+		/// <returns>the <see cref="GeoShapeMultiPointQueryDescriptor{T}"/></returns>
+		public static GeoShapeMultiPointQueryDescriptor<T> Coordinates<T>(
             this GeoShapeMultiPointQueryDescriptor<T> descriptor, 
             IMultiPoint multiPoint) where T : class
         {
             return descriptor.Coordinates(multiPoint.GetCoordinates());
         }
 
-        public static GeoShapeMultiPointQueryDescriptor<T> Boost<T>(
+		/// <summary>
+		/// Sets the boost
+		/// </summary>
+		/// <typeparam name="T">the document type</typeparam>
+		/// <param name="descriptor">the descriptor</param>
+		/// <param name="boost">the boost</param>
+		/// <returns>the <see cref="GeoShapeMultiPointQueryDescriptor{T}"/></returns>
+		public static GeoShapeMultiPointQueryDescriptor<T> Boost<T>(
             this GeoShapeMultiPointQueryDescriptor<T> descriptor, 
             double? boost) where T : class
         {

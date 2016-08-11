@@ -12,7 +12,7 @@ namespace Nest.Geospatial
     public static class FilterDescriptorExtensions
     {
         /// <summary>
-        ///     A filter allowing to filter hits based on a point location using a bounding box
+        ///     A filter allowing to filter hits based on a point location, using a bounding box
         /// </summary>
         public static FilterContainer GeoBoundingBox<T>(
             this FilterDescriptor<T> filterDescriptor,
@@ -123,7 +123,7 @@ namespace Nest.Geospatial
                         geo => geo.Coordinates(multiPolygon).Relation(relation));
 
                 default:
-                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' not supported");
+                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' is not supported");
             }
         }
 
@@ -175,7 +175,7 @@ namespace Nest.Geospatial
                         geo => geo.Coordinates(multiPolygon).Relation(relation));
 
                 default:
-                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' not supported");
+                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' is not supported");
             }
         }
 
