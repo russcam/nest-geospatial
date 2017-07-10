@@ -5,7 +5,7 @@ namespace Nest.Geospatial.Tests
 {
 	public abstract class ClusterBase : IDisposable
 	{
-		private const string ElasticsearchVersion = "1.7.5";
+		private const string ElasticsearchVersion = "1.7.6";
 
 		protected ClusterBase()
 		{

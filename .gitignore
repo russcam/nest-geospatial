@@ -35,3 +35,6 @@ _NCrunch*/
 
 packages/*
 .vs/*
+build/output/
+build/scripts/.fake/
+build/xunit.html

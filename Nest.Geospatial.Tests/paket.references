@@ -1,6 +1,9 @@
-FluentAssertions
 NEST
 NetTopologySuite.IO
 NetTopologySuite.IO.GeoJSON
-System.Reactive.Linq
-xunit
+
+group build
+	System.Reactive.Linq
+	System.Reactive.Interfaces
+	xunit
+	FluentAssertions

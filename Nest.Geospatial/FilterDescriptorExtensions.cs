@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using GeoAPI.Geometries;
+using NetTopologySuite.IO.Converters;
+using Newtonsoft.Json;
 
 namespace Nest.Geospatial
 {
+
+
     /// <summary>
     /// Extension methods for <see cref="FilterDescriptor{T}"/>
     /// </summary>
@@ -80,209 +84,74 @@ namespace Nest.Geospatial
         /// </summary>
         public static FilterContainer GeoShape<T>(
             this FilterDescriptor<T> filterDescriptor,
-            Expression<Func<T, object>> expression,
-            IGeometry geometry,
-            GeoShapeRelation relation) where T : class
+            Action<GeoShapeFilterDescriptor<T>> selector) where T : class
         {
-            switch (geometry.OgcGeometryType)
+            var descriptor = new GeoShapeFilterDescriptor<T>();
+            selector?.Invoke(descriptor);
+            IGeoShapeFilter filter = descriptor;
+            SetCacheAndName(filterDescriptor, filter);
+
+            return New(filterDescriptor, filter, f => f.GeoShape = filter);
+        }
+
+        private static FilterDescriptor<T> New<T>(FilterDescriptor<T> filterDescriptor, IFilter filter, Action<IFilterContainer> fillProperty)
+            where T : class
+        {
+            IFilterContainer self = filterDescriptor;
+            if (filter.IsConditionless && !self.IsVerbatim)
             {
-                case OgcGeometryType.Point:
-                    var point = (IPoint)geometry;
-                    return filterDescriptor.GeoShapePoint(
-                        expression,
-                        geo => geo.Coordinates(point).Relation(relation));
-
-                case OgcGeometryType.LineString:
-                    var lineString = (ILineString)geometry;
-                    return filterDescriptor.GeoShapeLineString(
-                        expression,
-                        geo => geo.Coordinates(lineString).Relation(relation));
-
-                case OgcGeometryType.Polygon:
-                    var polygon = (IPolygon)geometry;
-                    return filterDescriptor.GeoShapePolygon(
-                        expression,
-                        geo => geo.Coordinates(polygon).Relation(relation));
-
-                case OgcGeometryType.MultiPoint:
-                    var multiPoint = (IMultiPoint)geometry;
-                    return filterDescriptor.GeoShapeMultiPoint(
-                        expression,
-                        geo => geo.Coordinates(multiPoint).Relation(relation));
-
-                case OgcGeometryType.MultiLineString:
-                    var multiLineString = (IMultiLineString)geometry;
-                    return filterDescriptor.GeoShapeMultiLineString(
-                        expression,
-                        geo => geo.Coordinates(multiLineString).Relation(relation));
-
-                case OgcGeometryType.MultiPolygon:
-                    var multiPolygon = (IMultiPolygon)geometry;
-                    return filterDescriptor.GeoShapeMultiPolygon(
-                        expression,
-                        geo => geo.Coordinates(multiPolygon).Relation(relation));
-
-                default:
-                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' is not supported");
+                ResetCache(filterDescriptor);
+                return CreateConditionlessFilterDescriptor(filterDescriptor, filter);
             }
+
+            SetCacheAndName(filterDescriptor, filter);
+            var f = new FilterDescriptor<T>();
+            ((IFilterContainer)f).IsStrict = self.IsStrict;
+            ((IFilterContainer)f).IsVerbatim = self.IsVerbatim;
+            ((IFilterContainer)f).FilterName = self.FilterName;
+
+            fillProperty?.Invoke(f);
+
+            ResetCache(filterDescriptor);
+            return f;
         }
 
-        /// <summary>
-        ///     Filter documents indexed using a geo_shape type.
-        /// </summary>
-        public static FilterContainer GeoShape<T>(
-            this FilterDescriptor<T> filterDescriptor,
-            string field,
-            IGeometry geometry,
-            GeoShapeRelation relation) where T : class
+        private static FilterDescriptor<T> CreateConditionlessFilterDescriptor<T>(FilterDescriptor<T> filterDescriptor, IFilter filter, string type = null) where T : class
         {
-            switch (geometry.OgcGeometryType)
-            {
-                case OgcGeometryType.Point:
-                    var point = (IPoint)geometry;
-                    return filterDescriptor.GeoShapePoint(
-                        field,
-                        geo => geo.Coordinates(point).Relation(relation));
-
-                case OgcGeometryType.LineString:
-                    var lineString = (ILineString)geometry;
-                    return filterDescriptor.GeoShapeLineString(
-                        field,
-                        geo => geo.Coordinates(lineString).Relation(relation));
-
-                case OgcGeometryType.Polygon:
-                    var polygon = (IPolygon)geometry;
-                    return filterDescriptor.GeoShapePolygon(
-                        field,
-                        geo => geo.Coordinates(polygon).Relation(relation));
-
-                case OgcGeometryType.MultiPoint:
-                    var multiPoint = (IMultiPoint)geometry;
-                    return filterDescriptor.GeoShapeMultiPoint(
-                        field,
-                        geo => geo.Coordinates(multiPoint).Relation(relation));
-
-                case OgcGeometryType.MultiLineString:
-                    var multiLineString = (IMultiLineString)geometry;
-                    return filterDescriptor.GeoShapeMultiLineString(
-                        field,
-                        geo => geo.Coordinates(multiLineString).Relation(relation));
-
-                case OgcGeometryType.MultiPolygon:
-                    var multiPolygon = (IMultiPolygon)geometry;
-                    return filterDescriptor.GeoShapeMultiPolygon(
-                        field,
-                        geo => geo.Coordinates(multiPolygon).Relation(relation));
-
-                default:
-                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' is not supported");
-            }
+            IFilterContainer self = filterDescriptor;
+            if (self.IsStrict && !self.IsVerbatim)
+                throw new DslException(
+                    "Filter resulted in a conditionless " +
+                    $"'{type ?? filter.GetType().Name.Replace("Descriptor", "").Replace("`1", "")}' " +
+                    "filter (json by approx):\n" +
+                    $"{JsonConvert.SerializeObject(filterDescriptor, Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore})}"
+                );
+            var f = new FilterDescriptor<T>();
+            ((IFilterContainer)f).IsStrict = self.IsStrict;
+            ((IFilterContainer)f).IsVerbatim = self.IsVerbatim;
+            ((IFilterContainer)f).IsConditionless = true;
+            return f;
         }
 
-        /// <summary>
-        ///     Filter documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static FilterContainer GeoShapeCircle<T>(
-            this FilterDescriptor<T> filterDescriptor,
-            Expression<Func<T, object>> expression,
-            IPoint point,
-            double distance,
-            GeoPrecisionUnit unit,
-            GeoShapeRelation relation) where T : class
+        private static void ResetCache(IFilterContainer filterContainer)
         {
-            return filterDescriptor.GeoShapeCircle(
-                expression,
-                geo => geo
-                    .Coordinates(point)
-                    .Radius($"{distance}{unit.GetStringValue()}")
-                    .Relation(relation));
+            filterContainer.Cache = null;
+            filterContainer.CacheKey = null;
+            filterContainer.FilterName = null;
         }
 
-        /// <summary>
-        ///     Filter documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static FilterContainer GeoShapeCircle<T>(
-            this FilterDescriptor<T> filterDescriptor,
-            Expression<Func<T, object>> expression,
-            IPoint point,
-            string radius,
-            GeoShapeRelation relation) where T : class
+        private static void SetCacheAndName(IFilterContainer filterDescriptor, IFilter filter)
         {
-            return filterDescriptor.GeoShapeCircle(
-                expression,
-                geo => geo
-                    .Coordinates(point)
-                    .Radius(radius)
-                    .Relation(relation));
-        }
+            IFilterContainer self = filterDescriptor;
+            filter.IsStrict = self.IsStrict;
+            filter.IsVerbatim = self.IsVerbatim;
 
-        /// <summary>
-        ///     Filter documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static FilterContainer GeoShapeCircle<T>(
-            this FilterDescriptor<T> filterDescriptor,
-            string field,
-            IPoint point,
-            double distance,
-            GeoPrecisionUnit unit,
-            GeoShapeRelation relation) where T : class
-        {
-            return filterDescriptor.GeoShapeCircle(
-                field,
-                geo => geo
-                    .Coordinates(point)
-                    .Radius($"{distance}{unit.GetStringValue()}")
-                    .Relation(relation));
-        }
-
-        /// <summary>
-        ///     Filter documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static FilterContainer GeoShapeCircle<T>(
-            this FilterDescriptor<T> filterDescriptor,
-            string field,
-            IPoint point,
-            string radius,
-            GeoShapeRelation relation) where T : class
-        {
-            return filterDescriptor.GeoShapeCircle(
-                field,
-                geo => geo
-                    .Coordinates(point)
-                    .Radius(radius)
-                    .Relation(relation));
-        }
-
-        /// <summary>
-        ///     Filter documents indexed using the envelope geo_shape type.
-        /// </summary>
-        public static FilterContainer GeoShapeEnvelope<T>(
-            this FilterDescriptor<T> filterDescriptor,
-            Expression<Func<T, object>> expression,
-            Envelope envelope,
-            GeoShapeRelation relation) where T : class
-        {
-            return filterDescriptor.GeoShapeEnvelope(
-                expression,
-                geo => geo
-                    .Coordinates(envelope)
-                    .Relation(relation));
-        }
-
-        /// <summary>
-        ///     Filter documents indexed using the envelope geo_shape type.
-        /// </summary>
-        public static FilterContainer GeoShapeEnvelope<T>(
-            this FilterDescriptor<T> filterDescriptor,
-            string field,
-            Envelope envelope,
-            GeoShapeRelation relation) where T : class
-        {
-            return filterDescriptor.GeoShapeEnvelope(
-                field,
-                geo => geo
-                    .Coordinates(envelope)
-                    .Relation(relation));
+            if (self.Cache.HasValue)
+                filter.Cache = self.Cache;
+            if (!string.IsNullOrWhiteSpace(self.FilterName))
+                filter.FilterName = self.FilterName;
+            if (!string.IsNullOrWhiteSpace(self.CacheKey))
+                filter.CacheKey = self.CacheKey;
         }
 
         private static IEnumerable<Tuple<double, double>> GetCoordinates(ILineString lineString)

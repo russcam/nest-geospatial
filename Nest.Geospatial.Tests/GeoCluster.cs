@@ -20,9 +20,11 @@ namespace Nest.Geospatial.Tests
 		public const string SuburbsIndex = "suburbs";
 		private readonly int BulkSize = 50;
 
-		private string GeoData => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NEST", "GeoData");
+		private string GeoData => 
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NEST", "GeoData");
 
-		private string SuburbFolder => Path.Combine(GeoData, "suburbs");
+		private string SuburbFolder => 
+            Path.Combine(GeoData, "suburbs");
 
 		public override void Boostrap()
 		{
@@ -32,16 +34,19 @@ namespace Nest.Geospatial.Tests
 
 		public override IElasticClient GetClient(Func<ConnectionSettings, ConnectionSettings> settings = null)
 		{
-			Func<ConnectionSettings,ConnectionSettings> geoSettings = s => s
-				.SetDefaultIndex(SuburbsIndex)
-				.SetJsonSerializerSettingsModifier(js =>
-				{
-					js.Converters.Add(new GeometryConverter());
-					js.Converters.Add(new CoordinateConverter());
-					js.Converters.Add(new StringEnumConverter());
-				});
-		
-			settings = settings != null ? (s => geoSettings(settings(s))) : geoSettings;
+		    ConnectionSettings GeoSettings(ConnectionSettings s) => s
+                .SetDefaultIndex(SuburbsIndex)
+		        .SetJsonSerializerSettingsModifier(js =>
+		        {
+		            js.Converters.Add(new GeometryConverter());
+		            js.Converters.Add(new CoordinateConverter());
+		            js.Converters.Add(new StringEnumConverter());
+		        });
+
+		    settings = settings != null 
+                ? (s => GeoSettings(settings(s))) 
+                : (Func<ConnectionSettings,ConnectionSettings>) GeoSettings;
+
 			return base.GetClient(settings);
 		}
 
@@ -61,13 +66,6 @@ namespace Nest.Geospatial.Tests
 		{
 			var dbaseHeader = reader.DbaseHeader;
 			Console.WriteLine("{0} Columns, {1} Records", dbaseHeader.Fields.Length, dbaseHeader.NumRecords);
-
-			for (var i = 0; i < dbaseHeader.NumFields; i++)
-			{
-				var fieldDescriptor = dbaseHeader.Fields[i];
-				Console.WriteLine("{0} : {1}", fieldDescriptor.Name, fieldDescriptor.DbaseType);
-			}
-
 			return dbaseHeader;
 		}
 
@@ -83,13 +81,13 @@ namespace Nest.Geospatial.Tests
 			{
 				Console.WriteLine($"Download State Suburbs from {absUrl}");
 				new WebClient().DownloadFile(absUrl, localZip);
-				Console.WriteLine($"Downloaded State Suburbs");
+				Console.WriteLine("Downloaded State Suburbs");
 			}
 
 			if (!Directory.Exists(SuburbFolder))
 			{
 				Directory.CreateDirectory(SuburbFolder);
-				Console.WriteLine($"Unzipping State Suburbs...");
+				Console.WriteLine("Unzipping State Suburbs...");
 				ZipFile.ExtractToDirectory(localZip, SuburbFolder);
 			}
 		}

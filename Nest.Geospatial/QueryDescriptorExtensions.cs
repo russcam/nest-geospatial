@@ -2,346 +2,55 @@ using System;
 using System.Linq.Expressions;
 using GeoAPI.Geometries;
 using Nest.DSL.Query.Behaviour;
+using Nest.Resolvers.Converters;
 using NetTopologySuite.IO.Converters;
 using Newtonsoft.Json;
 
 namespace Nest.Geospatial
 {
-	public interface IGeoShapeQuery : Nest.IGeoShapeQuery
-	{
-		[JsonProperty("shape")]
-		[JsonConverter(typeof(GeoShapeConverter))]
-		IGeometry Shape { get; set; }
-
-		[JsonProperty(PropertyName = "boost")]
-		double? Boost { get; set; }
-	}
-
-	public class GeoShapeConverter : CompositeJsonConverter<GeometryConverter,>
-	{
-	}
-
-	public class GeoShapeQueryDescriptor<T> : Nest.Geospatial.IGeoShapeQuery where T : class 
-	{
-		private IGeoShapeQuery Self => this;
-
-		PropertyPathMarker Nest.IGeoShapeQuery.Field { get; set; }
-		IGeometry IGeoShapeQuery.Shape { get; set; }
-		bool IQuery.IsConditionless => Self.Field == null || (string.IsNullOrEmpty(Self.Name) && Self.Field.Type == null) || Self.Shape == null;
-		string IQuery.Name { get; set; }
-		double? IGeoShapeQuery.Boost { get; set; }
-
-		void IFieldNameQuery.SetFieldName(string fieldName)
-		{
-			Self.Field = fieldName;
-		}
-
-		PropertyPathMarker IFieldNameQuery.GetFieldName()
-		{
-			return Self.Field;
-		}
-
-		public GeoShapeQueryDescriptor<T> Name(string name)
-		{
-			Self.Name = name;
-			return this;
-		}
-
-		public GeoShapeQueryDescriptor<T> OnField(string field)
-		{
-			Self.Field = field;
-			return this;
-		}
-
-		public GeoShapeQueryDescriptor<T> OnField(Expression<Func<T, object>> objectPath)
-		{
-			Self.Field = objectPath;
-			return this;
-		}
-
-		/// <summary>
-		/// Sets the coordinates using the given <see cref="IGeometry"/>
-		/// </summary>
-		/// <param name="coordinates">the geometry from which to define the coordinates</param>
-		/// <returns>the <see cref="GeoShapeQueryDescriptor{T}"/></returns>
-		public GeoShapeQueryDescriptor<T> Coordinates(IGeometry coordinates)
-		{
-			Self.Shape = coordinates;
-			return this;
-		}
-
-		public GeoShapeQueryDescriptor<T> Boost(double boost)
-		{
-			Self.Boost = boost;
-			return this;
-		}
-	}
-
 	/// <summary>
 	/// Extension methods for QueryDescriptor&lt;T&gt;
 	/// </summary>
 	public static class QueryDescriptorExtensions
     {
-
-
         /// <summary>
         /// Query documents indexed using a geo_shape type.
         /// </summary>
         public static QueryContainer GeoShape<T>(
             this QueryDescriptor<T> queryDescriptor,
-            Expression<Func<T, object>> expression,
-            IGeometry geometry,
-            string name = null,
-            double? boost = null) where T : class
+            Action<GeoShapeQueryDescriptor<T>> selector) where T : class
         {
-            switch (geometry.OgcGeometryType)
-            {
-                case OgcGeometryType.Point:
-                    var point = (IPoint)geometry;
-                    return queryDescriptor.GeoShapePoint(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(expression)
-                            .Coordinates(point));
+            var query = new GeoShapeQueryDescriptor<T>();
+            selector(query);
 
-                case OgcGeometryType.LineString:
-                    var lineString = (ILineString)geometry;
-                    return queryDescriptor.GeoShapeLineString(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(expression)
-                            .Coordinates(lineString));
+            if (queryDescriptor.IsConditionless && !queryDescriptor.IsVerbatim)
+                return CreateConditionlessQueryDescriptor(queryDescriptor, query);
 
-                case OgcGeometryType.Polygon:
-                    var polygon = (IPolygon)geometry;
-                    return queryDescriptor.GeoShapePolygon(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(expression)
-                            .Coordinates(polygon));
-
-                case OgcGeometryType.MultiPoint:
-                    var multiPoint = (IMultiPoint)geometry;
-                    return queryDescriptor.GeoShapeMultiPoint(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(expression)
-                            .Coordinates(multiPoint));
-
-                case OgcGeometryType.MultiLineString:
-                    var multiLineString = (IMultiLineString)geometry;
-                    return queryDescriptor.GeoShapeMultiLineString(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(expression)
-                            .Coordinates(multiLineString));
-
-                case OgcGeometryType.MultiPolygon:
-                    var multiPolygon = (IMultiPolygon)geometry;
-                    return queryDescriptor.GeoShapeMultiPolygon(
-                        geo => geo
-                            .Name(name)
-                            .Boost(boost)
-                            .OnField(expression)
-                            .Coordinates(multiPolygon));
-
-                default:
-                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' not supported");
-            }
+            return SetGeoShapeQuery(queryDescriptor, query);
         }
 
-        /// <summary>
-        /// Query documents indexed using a geo_shape type.
-        /// </summary>
-        public static QueryContainer GeoShape<T>(
-            this QueryDescriptor<T> queryDescriptor,
-            string field,
-            IGeometry geometry,
-            string name = null,
-            double? boost = null) where T : class
+        private static QueryContainer SetGeoShapeQuery<T>(QueryDescriptor<T> queryDescriptor,
+            IGeoShapeQuery query) where T : class
         {
-            switch (geometry.OgcGeometryType)
-            {
-                case OgcGeometryType.Point:
-                    var point = (IPoint)geometry;
-                    return queryDescriptor.GeoShapePoint(geo => geo
-                        .Name(name)
-                        .Boost(boost)
-                        .OnField(field)
-                        .Coordinates(point)
-					);
+            var descriptor = new QueryDescriptor<T>();
+            ((IQueryContainer)descriptor).IsStrict = queryDescriptor.IsStrict;
+            ((IQueryContainer)descriptor).IsVerbatim = queryDescriptor.IsVerbatim;
+            ((IQueryContainer)descriptor).GeoShape = query;
 
-                case OgcGeometryType.LineString:
-                    var lineString = (ILineString)geometry;
-                    return queryDescriptor.GeoShapeLineString(geo => geo
-                        .Name(name)
-                        .Boost(boost)
-                        .OnField(field)
-                        .Coordinates(lineString)
-					);
-
-                case OgcGeometryType.Polygon:
-                    var polygon = (IPolygon)geometry;
-                    return queryDescriptor.GeoShapePolygon(geo => geo
-                        .Name(name)
-                        .Boost(boost)
-                        .OnField(field)
-                        .Coordinates(polygon)
-					);
-
-                case OgcGeometryType.MultiPoint:
-                    var multiPoint = (IMultiPoint)geometry;
-                    return queryDescriptor.GeoShapeMultiPoint(geo => geo
-                        .Name(name)
-                        .Boost(boost)
-                        .OnField(field)
-                        .Coordinates(multiPoint)
-					);
-
-                case OgcGeometryType.MultiLineString:
-                    var multiLineString = (IMultiLineString)geometry;
-                    return queryDescriptor.GeoShapeMultiLineString(geo => geo
-                        .Name(name)
-                        .Boost(boost)
-                        .OnField(field)
-                        .Coordinates(multiLineString)
-					);
-
-                case OgcGeometryType.MultiPolygon:
-                    var multiPolygon = (IMultiPolygon)geometry;
-                    return queryDescriptor.GeoShapeMultiPolygon(geo => geo
-						.Name(name)
-						.Boost(boost)
-						.OnField(field)
-						.Coordinates(multiPolygon)
-					);
-
-                default:
-                    throw new NotSupportedException($"geometry '{geometry.GeometryType}' not supported");
-            }
+            return descriptor;
         }
 
-        /// <summary>
-        /// Query documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static QueryContainer GeoShapeCircle<T>(
-            this QueryDescriptor<T> queryDescriptor,
-            Expression<Func<T, object>> expression,
-            IPoint point,
-            double distance,
-            GeoPrecisionUnit unit,
-            string name = null,
-            double? boost = null) where T : class
+        private static QueryDescriptor<T> CreateConditionlessQueryDescriptor<T>(QueryDescriptor<T> queryDescriptor, IQuery query) where T : class
         {
-            return queryDescriptor.GeoShapeCircle(geo => geo
-                .OnField(expression)
-                .Name(name)
-                .Boost(boost)
-                .Coordinates(point.GetCoordinates())
-                .Radius($"{distance}{unit.GetStringValue()}")
-			);
-        }
+            if (queryDescriptor.IsStrict && !queryDescriptor.IsVerbatim)
+                throw new DslException("Query resulted in a conditionless " +
+                                       $"{query.GetType().Name.Replace("Descriptor", "").Replace("`1", "")} " +
+                                       "query (json by approx):\n" +
+                                       $"{JsonConvert.SerializeObject(queryDescriptor, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })}");
 
-        /// <summary>
-        /// Query documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static QueryContainer GeoShapeCircle<T>(
-            this QueryDescriptor<T> queryDescriptor,
-            Expression<Func<T, object>> expression,
-            IPoint point,
-            string radius,
-            string name = null,
-            double? boost = null) where T : class
-        {
-            return queryDescriptor.GeoShapeCircle(geo => geo
-                .OnField(expression)
-                .Name(name)
-                .Boost(boost)
-                .Coordinates(point)
-                .Radius(radius)
-			);
-        }
-
-        /// <summary>
-        /// Query documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static QueryContainer GeoShapeCircle<T>(
-            this QueryDescriptor<T> queryDescriptor,
-            string field,
-            IPoint point,
-            double distance,
-            GeoPrecisionUnit unit,
-            string name = null,
-            double? boost = null) where T : class
-        {
-            return queryDescriptor.GeoShapeCircle(geo => geo
-                .OnField(field)
-                .Name(name)
-                .Boost(boost)
-                .Coordinates(point)
-                .Radius($"{distance}{unit.GetStringValue()}")
-			);
-        }
-
-        /// <summary>
-        /// Query documents indexed using the circle geo_shape type.
-        /// </summary>
-        public static QueryContainer GeoShapeCircle<T>(
-            this QueryDescriptor<T> queryDescriptor,
-            string field,
-            IPoint point,
-            string radius,
-            string name = null,
-            double? boost = null) where T : class
-        {
-            return queryDescriptor.GeoShapeCircle(geo => geo
-                .OnField(field)
-                .Name(name)
-                .Boost(boost)
-                .Coordinates(point)
-                .Radius(radius)
-			);
-        }
-
-        /// <summary>
-        /// Query documents indexed using the envelope geo_shape type.
-        /// </summary>
-        public static QueryContainer GeoShapeEnvelope<T>(
-            this QueryDescriptor<T> queryDescriptor,
-            Expression<Func<T, object>> expression,
-            Envelope envelope,
-            string name = null,
-            double? boost = null) where T : class
-        {
-            return queryDescriptor.GeoShapeEnvelope(geo => geo
-                .OnField(expression)
-                .Name(name)
-                .Boost(boost)
-                .Coordinates(envelope)
-			);
-        }
-
-        /// <summary>
-        /// Query documents indexed using the envelope geo_shape type.
-        /// </summary>
-        public static QueryContainer GeoShapeEnvelope<T>(
-            this QueryDescriptor<T> queryDescriptor,
-            string field,
-            Envelope envelope,
-            string name = null,
-            double? boost = null) where T : class
-        {
-            return queryDescriptor.GeoShapeEnvelope(geo => geo
-                .OnField(field)
-                .Name(name)
-                .Boost(boost)
-                .Coordinates(envelope)
-			);
+            var q = new QueryDescriptor<T>();
+            ((IQueryContainer)q).IsConditionless = true;
+            return q;
         }
     }
 }

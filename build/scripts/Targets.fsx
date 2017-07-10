@@ -1,24 +1,30 @@
 ﻿// include Fake lib
 #r "../../packages/build/FAKE/tools/FakeLib.dll"
 open Fake
+open Fake.Testing.XUnit2
 
 // Properties
-let buildDir = "./build/output"
+let buildDir = "./build"
+let buildOutputDir = buildDir @@ "/output"
 
 // Targets
-Target "Clean" <| fun _ -> CleanDir buildDir
-
+Target "Clean" <| fun _ -> CleanDir buildOutputDir
 
 Target "BuildApp" <| fun _ ->
     !! "./**/*.csproj"
-    |> MSBuildRelease buildDir "Build"
+    |> MSBuildRelease buildOutputDir "Build"
     |> Log "AppBuild-Output: "
 
 Target "Build" <| fun _ -> trace "Build Nest.Geospatial"
 
+Target "Test" <| fun _ ->
+    !! (buildOutputDir @@ "Nest.GeoSpatial.Tests.dll")
+    |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (buildDir @@ "xunit.html") }) 
+
 // Dependencies
 "Clean"
   ==> "BuildApp"
+  ==> "Test"
   ==> "Build"
 
 // start build
