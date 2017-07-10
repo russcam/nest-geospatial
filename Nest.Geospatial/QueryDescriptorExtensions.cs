@@ -1,14 +1,89 @@
 using System;
 using System.Linq.Expressions;
 using GeoAPI.Geometries;
+using Nest.DSL.Query.Behaviour;
+using NetTopologySuite.IO.Converters;
+using Newtonsoft.Json;
 
 namespace Nest.Geospatial
 {
+	public interface IGeoShapeQuery : Nest.IGeoShapeQuery
+	{
+		[JsonProperty("shape")]
+		[JsonConverter(typeof(GeoShapeConverter))]
+		IGeometry Shape { get; set; }
+
+		[JsonProperty(PropertyName = "boost")]
+		double? Boost { get; set; }
+	}
+
+	public class GeoShapeConverter : CompositeJsonConverter<GeometryConverter,>
+	{
+	}
+
+	public class GeoShapeQueryDescriptor<T> : Nest.Geospatial.IGeoShapeQuery where T : class 
+	{
+		private IGeoShapeQuery Self => this;
+
+		PropertyPathMarker Nest.IGeoShapeQuery.Field { get; set; }
+		IGeometry IGeoShapeQuery.Shape { get; set; }
+		bool IQuery.IsConditionless => Self.Field == null || (string.IsNullOrEmpty(Self.Name) && Self.Field.Type == null) || Self.Shape == null;
+		string IQuery.Name { get; set; }
+		double? IGeoShapeQuery.Boost { get; set; }
+
+		void IFieldNameQuery.SetFieldName(string fieldName)
+		{
+			Self.Field = fieldName;
+		}
+
+		PropertyPathMarker IFieldNameQuery.GetFieldName()
+		{
+			return Self.Field;
+		}
+
+		public GeoShapeQueryDescriptor<T> Name(string name)
+		{
+			Self.Name = name;
+			return this;
+		}
+
+		public GeoShapeQueryDescriptor<T> OnField(string field)
+		{
+			Self.Field = field;
+			return this;
+		}
+
+		public GeoShapeQueryDescriptor<T> OnField(Expression<Func<T, object>> objectPath)
+		{
+			Self.Field = objectPath;
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the coordinates using the given <see cref="IGeometry"/>
+		/// </summary>
+		/// <param name="coordinates">the geometry from which to define the coordinates</param>
+		/// <returns>the <see cref="GeoShapeQueryDescriptor{T}"/></returns>
+		public GeoShapeQueryDescriptor<T> Coordinates(IGeometry coordinates)
+		{
+			Self.Shape = coordinates;
+			return this;
+		}
+
+		public GeoShapeQueryDescriptor<T> Boost(double boost)
+		{
+			Self.Boost = boost;
+			return this;
+		}
+	}
+
 	/// <summary>
 	/// Extension methods for QueryDescriptor&lt;T&gt;
 	/// </summary>
 	public static class QueryDescriptorExtensions
     {
+
+
         /// <summary>
         /// Query documents indexed using a geo_shape type.
         /// </summary>

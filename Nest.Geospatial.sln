@@ -1,9 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{9635A042-7355-4A2D-998C-659277F0C679}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nest.Geospatial", "Nest.Geospatial\Nest.Geospatial.csproj", "{D5019AE5-8637-4B80-9679-B33DE407118A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nest.Geospatial.Tests", "Nest.Geospatial.Tests\Nest.Geospatial.Tests.csproj", "{2ECF9429-1B30-4F45-B8E7-D4FC84EAB9D5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "scripts", "build\scripts\scripts.fsproj", "{01F026D8-4289-49F9-A698-980E12378FA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +24,14 @@ Global
 		{D5019AE5-8637-4B80-9679-B33DE407118A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5019AE5-8637-4B80-9679-B33DE407118A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5019AE5-8637-4B80-9679-B33DE407118A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ECF9429-1B30-4F45-B8E7-D4FC84EAB9D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ECF9429-1B30-4F45-B8E7-D4FC84EAB9D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ECF9429-1B30-4F45-B8E7-D4FC84EAB9D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ECF9429-1B30-4F45-B8E7-D4FC84EAB9D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01F026D8-4289-49F9-A698-980E12378FA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01F026D8-4289-49F9-A698-980E12378FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01F026D8-4289-49F9-A698-980E12378FA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01F026D8-4289-49F9-A698-980E12378FA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

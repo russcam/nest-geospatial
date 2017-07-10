@@ -1,0 +1,6 @@
+FluentAssertions
+NEST
+NetTopologySuite.IO
+NetTopologySuite.IO.GeoJSON
+System.Reactive.Linq
+xunit

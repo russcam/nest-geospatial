@@ -1,0 +1,15 @@
+source https://www.myget.org/F/aspnetvnext/api/v3/index.json
+source https://www.nuget.org/api/v2/
+source https://api.nuget.org/v3/index.json
+
+nuget FluentAssertions 4.13.0 framework: >= net461
+nuget NEST 1.9.0
+nuget NetTopologySuite.IO 1.14.0.1 framework: >= net461
+nuget NetTopologySuite.IO.GeoJSON 1.14
+nuget System.Reactive.Linq 3.0.0 framework: >= net461
+nuget xunit 2.1.0 framework: >= net461
+
+group build
+	source https://api.nuget.org/v3/index.json	
+
+	nuget FAKE
