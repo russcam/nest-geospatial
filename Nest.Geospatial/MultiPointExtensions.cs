@@ -15,15 +15,12 @@ namespace Nest.Geospatial
 		/// <param name="multiPoint">the MultiPoint</param>
 		/// <returns>A collection of coordinates</returns>
         public static IEnumerable<IEnumerable<double>> GetCoordinates(this IMultiPoint multiPoint)
-        {
-			if (multiPoint == null)
-			{
-				return Enumerable.Empty<IEnumerable<double>>();
-			}
-
-            return multiPoint.Geometries
-                .Cast<IPoint>()
-                .Select(p => p.GetCoordinates());
-        } 
+		{
+		    return multiPoint == null
+		        ? Enumerable.Empty<IEnumerable<double>>()
+		        : multiPoint.Geometries
+		            .Cast<IPoint>()
+		            .Select(p => p.GetCoordinates());
+		} 
     }
 }

@@ -16,15 +16,12 @@ namespace Nest.Geospatial
 		/// <returns>A collection of collections of collections of coordinates</returns>
         public static IEnumerable<IEnumerable<IEnumerable<IEnumerable<double>>>> GetCoordinates(
             this IMultiPolygon multiPolygon)
-        {
-			if (multiPolygon == null)
-			{
-				return Enumerable.Empty<IEnumerable<IEnumerable<IEnumerable<double>>>>();
-			}
-
-            return multiPolygon.Geometries
-                .Cast<IPolygon>()
-                .Select(p => p.GetCoordinates());
-        }
+		{
+		    return multiPolygon == null
+		        ? Enumerable.Empty<IEnumerable<IEnumerable<IEnumerable<double>>>>()
+		        : multiPolygon.Geometries
+		            .Cast<IPolygon>()
+		            .Select(p => p.GetCoordinates());
+		}
     }
 }

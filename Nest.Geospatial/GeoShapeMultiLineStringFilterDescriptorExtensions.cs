@@ -16,9 +16,6 @@ namespace Nest.Geospatial
 		/// <returns>the <see cref="GeoShapeMultiLineStringFilterDescriptor"/></returns>
 		public static GeoShapeMultiLineStringFilterDescriptor Coordinates(
             this GeoShapeMultiLineStringFilterDescriptor descriptor, 
-            IMultiLineString multiLineString)
-        {
-            return descriptor.Coordinates(multiLineString.GetCoordinates());
-        }
+            IMultiLineString multiLineString) => descriptor.Coordinates(multiLineString.GetCoordinates());
     }
 }

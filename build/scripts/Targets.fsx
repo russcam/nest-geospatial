@@ -24,8 +24,10 @@ Target "Test" <| fun _ ->
 // Dependencies
 "Clean"
   ==> "BuildApp"
-  ==> "Test"
   ==> "Build"
+
+"BuildApp"
+  ==> "Test"
 
 // start build
 RunTargetOrDefault "Build"

@@ -8,8 +8,6 @@ using Newtonsoft.Json;
 
 namespace Nest.Geospatial
 {
-
-
     /// <summary>
     /// Extension methods for <see cref="FilterDescriptor{T}"/>
     /// </summary>
@@ -22,16 +20,14 @@ namespace Nest.Geospatial
             this FilterDescriptor<T> filterDescriptor,
             Expression<Func<T, object>> expression,
             Envelope envelope,
-            GeoExecution? geoExecution = null) where T : class
-        {
-            return filterDescriptor.GeoBoundingBox(
+            GeoExecution? geoExecution = null) where T : class => 
+            filterDescriptor.GeoBoundingBox(
                 expression,
                 envelope.MinX,
                 envelope.MaxY,
                 envelope.MaxX,
                 envelope.MinY,
                 geoExecution);
-        }
 
         /// <summary>
         ///     A filter allowing to filter hits based on a point location using a bounding box
@@ -40,16 +36,14 @@ namespace Nest.Geospatial
             this FilterDescriptor<T> filterDescriptor,
             string field,
             Envelope envelope,
-            GeoExecution? geoExecution = null) where T : class
-        {
-            return filterDescriptor.GeoBoundingBox(
+            GeoExecution? geoExecution = null) where T : class => 
+            filterDescriptor.GeoBoundingBox(
                 field,
                 envelope.MinX,
                 envelope.MaxY,
                 envelope.MaxX,
                 envelope.MinY,
                 geoExecution);
-        }
 
         /// <summary>
         ///     A filter allowing to include hits that only fall within a polygon of points.
@@ -60,10 +54,8 @@ namespace Nest.Geospatial
         public static FilterContainer GeoPolygon<T>(
             this FilterDescriptor<T> filterDescriptor,
             Expression<Func<T, object>> expression,
-            IPolygon polygon) where T : class
-        {
-            return filterDescriptor.GeoPolygon(expression, GetCoordinates(polygon.ExteriorRing));
-        }
+            IPolygon polygon) where T : class => 
+            filterDescriptor.GeoPolygon(expression, GetCoordinates(polygon.ExteriorRing));
 
         /// <summary>
         ///     A filter allowing to include hits that only fall within a polygon of points.
@@ -74,10 +66,8 @@ namespace Nest.Geospatial
         public static FilterContainer GeoPolygon<T>(
             this FilterDescriptor<T> filterDescriptor,
             string field,
-            IPolygon polygon) where T : class
-        {
-            return filterDescriptor.GeoPolygon(field, GetCoordinates(polygon.ExteriorRing));
-        }
+            IPolygon polygon) where T : class => 
+            filterDescriptor.GeoPolygon(field, GetCoordinates(polygon.ExteriorRing));
 
         /// <summary>
         ///     Filter documents indexed using a geo_shape type.
@@ -142,21 +132,18 @@ namespace Nest.Geospatial
 
         private static void SetCacheAndName(IFilterContainer filterDescriptor, IFilter filter)
         {
-            IFilterContainer self = filterDescriptor;
-            filter.IsStrict = self.IsStrict;
-            filter.IsVerbatim = self.IsVerbatim;
+            filter.IsStrict = filterDescriptor.IsStrict;
+            filter.IsVerbatim = filterDescriptor.IsVerbatim;
 
-            if (self.Cache.HasValue)
-                filter.Cache = self.Cache;
-            if (!string.IsNullOrWhiteSpace(self.FilterName))
-                filter.FilterName = self.FilterName;
-            if (!string.IsNullOrWhiteSpace(self.CacheKey))
-                filter.CacheKey = self.CacheKey;
+            if (filterDescriptor.Cache.HasValue)
+                filter.Cache = filterDescriptor.Cache;
+            if (!string.IsNullOrWhiteSpace(filterDescriptor.FilterName))
+                filter.FilterName = filterDescriptor.FilterName;
+            if (!string.IsNullOrWhiteSpace(filterDescriptor.CacheKey))
+                filter.CacheKey = filterDescriptor.CacheKey;
         }
 
-        private static IEnumerable<Tuple<double, double>> GetCoordinates(ILineString lineString)
-        {
-            return lineString.Coordinates.Select(c => Tuple.Create(c.X, c.Y));
-        }
+        private static IEnumerable<Tuple<double, double>> GetCoordinates(ILineString lineString) => 
+            lineString.Coordinates.Select(c => Tuple.Create(c.X, c.Y));
     }
 }

@@ -14,9 +14,8 @@ namespace Nest.Geospatial
 		/// <param name="descriptor">the descriptor</param>
 		/// <param name="point">the Point</param>
 		/// <returns>the <see cref="GeoShapePointFilterDescriptor"/></returns>
-		public static GeoShapePointFilterDescriptor Coordinates(this GeoShapePointFilterDescriptor descriptor, IPoint point)
-        {
-            return descriptor.Coordinates(point.GetCoordinates());
-        }
+		public static GeoShapePointFilterDescriptor Coordinates(
+            this GeoShapePointFilterDescriptor descriptor, 
+            IPoint point) => descriptor.Coordinates(point.GetCoordinates());
     }
 }

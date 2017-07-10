@@ -15,9 +15,6 @@ namespace Nest.Geospatial
 		/// <returns>the <see cref="GeoShapeCircleFilterDescriptor"/></returns>
 		public static GeoShapeCircleFilterDescriptor Coordinates(
             this GeoShapeCircleFilterDescriptor descriptor,
-            IPoint point)
-        {
-            return descriptor.Coordinates(point.GetCoordinates());
-        }
+            IPoint point) => descriptor.Coordinates(point.GetCoordinates());
     }
 }

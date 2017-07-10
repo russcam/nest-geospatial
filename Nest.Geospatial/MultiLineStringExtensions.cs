@@ -15,15 +15,12 @@ namespace Nest.Geospatial
 		/// <param name="multiLineString">the MultiLineString</param>
 		/// <returns>A collection of collections of coordinates</returns>
         public static IEnumerable<IEnumerable<IEnumerable<double>>> GetCoordinates(this IMultiLineString multiLineString)
-        {
-			if (multiLineString == null)
-			{
-				return Enumerable.Empty<IEnumerable<IEnumerable<double>>>();
-			}
-
-            return multiLineString.Geometries
-                .Cast<ILineString>()
-                .Select(l => l.GetCoordinates());
-        }
+		{
+		    return multiLineString == null
+		        ? Enumerable.Empty<IEnumerable<IEnumerable<double>>>()
+		        : multiLineString.Geometries
+		            .Cast<ILineString>()
+		            .Select(l => l.GetCoordinates());
+		}
     }
 }

@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="ClusterBase.cs" />
     <Compile Include="GeoCluster.cs" />
+    <Compile Include="GeoShapeMultiPointTests.cs" />
     <Compile Include="GeoShapePointTests.cs" />
     <Compile Include="GeoShapePolygonTests.cs" />
     <Compile Include="GeoTests.cs" />

@@ -15,9 +15,6 @@ namespace Nest.Geospatial
 		/// <returns>the <see cref="GeoShapeMultiPolygonFilterDescriptor"/></returns>
 		public static GeoShapeMultiPolygonFilterDescriptor Coordinates(
             this GeoShapeMultiPolygonFilterDescriptor descriptor,
-            IMultiPolygon multiPolygon)
-        {
-            return descriptor.Coordinates(multiPolygon.GetCoordinates());
-        }
+            IMultiPolygon multiPolygon) => descriptor.Coordinates(multiPolygon.GetCoordinates());
     }
 }

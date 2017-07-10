@@ -15,9 +15,6 @@ namespace Nest.Geospatial
 		/// <returns>the <see cref="GeoShapeMultiPointFilterDescriptor"/></returns>
 		public static GeoShapeMultiPointFilterDescriptor Coordinates(
             this GeoShapeMultiPointFilterDescriptor descriptor,
-            IMultiPoint multiPoint)
-        {
-            return descriptor.Coordinates(multiPoint.GetCoordinates());
-        }
+            IMultiPoint multiPoint) => descriptor.Coordinates(multiPoint.GetCoordinates());
     }
 }

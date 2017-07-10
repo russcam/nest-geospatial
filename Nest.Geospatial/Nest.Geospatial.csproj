@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoordinateExtensions.cs" />
-    <Compile Include="EnumExtensions.cs" />
     <Compile Include="EnvelopeExtensions.cs" />
     <Compile Include="FilterDescriptorExtensions.cs" />
     <Compile Include="GeoShapeCircleFilterDescriptorExtensions.cs" />

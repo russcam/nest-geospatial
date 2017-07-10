@@ -23,24 +23,20 @@ namespace Nest.Geospatial
 			}
 
 			var polygonCoordinates = new List<IEnumerable<IEnumerable<double>>>();
-			var exteriorRingCoordinates = polygon.ExteriorRing.Coordinates;
+			var exteriorRingCoordinates = polygon.Shell.Coordinates;
 
 			// outer ring should be counter clock-wise
-			polygonCoordinates.Add(CGAlgorithms.IsCCW(exteriorRingCoordinates)
-				? exteriorRingCoordinates.GetCoordinates()
-				: exteriorRingCoordinates.Reverse().GetCoordinates());
+			polygonCoordinates.Add(exteriorRingCoordinates.GetCoordinates());
 
 			if (polygon.NumInteriorRings > 0)
 			{
-				// inner rings should be clockwise
-				foreach (var interiorRing in polygon.InteriorRings)
-				{
-					var coordinates = interiorRing.Coordinates;
-
-					polygonCoordinates.Add(CGAlgorithms.IsCCW(interiorRing.Coordinates)
-						? coordinates.Reverse().GetCoordinates()
-						: coordinates.GetCoordinates());
-				}
+			    // inner rings should be clockwise
+			    for (var index = 0; index < polygon.Holes.Length; index++)
+			    {
+			        var interiorRing = polygon.Holes[index];
+			        var coordinates = interiorRing.Coordinates;
+			        polygonCoordinates.Add(coordinates.GetCoordinates());
+			    }
 			}
 
 			return polygonCoordinates;

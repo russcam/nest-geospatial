@@ -16,25 +16,6 @@ namespace Nest.Geospatial
 		/// <returns>the <see cref="GeoShapeMultiPolygonQueryDescriptor{T}"/></returns>
 		public static GeoShapeMultiPolygonQueryDescriptor<T> Coordinates<T>(
             this GeoShapeMultiPolygonQueryDescriptor<T> descriptor,
-            IMultiPolygon multiPolygon) where T : class
-        {
-            return descriptor.Coordinates(multiPolygon.GetCoordinates());
-        }
-
-		/// <summary>
-		/// Sets the boost
-		/// </summary>
-		/// <typeparam name="T">the document type</typeparam>
-		/// <param name="descriptor">the descriptor</param>
-		/// <param name="boost">the boost</param>
-		/// <returns>the <see cref="GeoShapeMultiPolygonQueryDescriptor{T}"/></returns>
-		public static GeoShapeMultiPolygonQueryDescriptor<T> Boost<T>(
-            this GeoShapeMultiPolygonQueryDescriptor<T> descriptor,
-            double? boost = null) where T : class
-        {
-            return boost.HasValue
-                ? descriptor.Boost(boost.Value)
-                : descriptor;
-        }
+            IMultiPolygon multiPolygon) where T : class => descriptor.Coordinates(multiPolygon.GetCoordinates());
     }
 }

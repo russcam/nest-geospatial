@@ -1,7 +1,6 @@
-source https://www.myget.org/F/aspnetvnext/api/v3/index.json
+source https://www.myget.org/F/aspnetvnext/
 source https://www.nuget.org/api/v2/
 source https://api.nuget.org/v3/index.json
-
 
 nuget NEST 1.9.2
 nuget NetTopologySuite.IO 1.14.0.1

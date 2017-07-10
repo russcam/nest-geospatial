@@ -5,7 +5,7 @@ using GeoAPI.Geometries;
 namespace Nest.Geospatial
 {
 	/// <summary>
-	/// Extension methods for Envelopes
+	/// Extension methods for <see cref="Envelope"/>
 	/// </summary>
     public static class EnvelopeExtensions
     {
